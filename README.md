@@ -37,5 +37,9 @@ Biswap FlashSwap Testing
 ```sh
 forge test --contracts ./src/test/Biswap_flashloan.sol -vv
 ```
-
+### ChainLink Testing
+getLatestPrice
+```sh
+forge test --contracts ./src/test/Chainlink.sol -vv
+```
 
