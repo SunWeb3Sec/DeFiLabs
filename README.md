@@ -2,7 +2,7 @@
 
 In-progress.
 
-This repo aim to learn DeFi projects; how the functionality works, on-chain testing, bug finding, fuzzing, etc.
+This repo aim to learn DeFi projects; how the functionality works, on-chain testing, bug finding, fuzzing, CI etc.
 
 ## Getting Started
 
