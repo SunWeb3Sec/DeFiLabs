@@ -45,4 +45,9 @@ getLatestPrice
 ```sh
 forge test --contracts ./src/test/Chainlink.sol -vv
 ```
+### Compound Testing
+ERC20 - cToken Supply/Redeem
+```sh
+forge test --contracts ./src/test/CompoundErc20.sol -vv
+```
 
