@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
-import "./interfaces/ICompound.sol.sol";
+import "./interfaces/ICompound.sol";
 import "./interfaces/IERC20.sol";
 
 
