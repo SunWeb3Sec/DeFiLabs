@@ -43,13 +43,24 @@ Biswap FlashSwap Testing
 forge test --contracts ./src/test/Biswap_flashloan.sol -vv
 ```
 ### ChainLink Testing
-getLatestPrice
+getLatestPrice | more tests in-progress
 ```sh
 forge test --contracts ./src/test/Chainlink.sol -vv
 ```
 ### Compound Testing
-ERC20 - cToken Supply/Redeem
+ERC20 - cToken Supply/Redeem | more tests in-progress
 ```sh
 forge test --contracts ./src/test/CompoundErc20.sol -vv
 ```
-
+### UniswapV2 Testing
+Swap | more tests in-progress
+```sh
+forge test --contracts ./src/test/Uniswapv2.sol -vv
+```
+### Curve Testing
+Swap | more tests in-progress
+```sh
+forge test --contracts ./src/test/Curve.sol -vv
+```
+### MakerDAO Testing
+### Balancer Testing
