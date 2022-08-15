@@ -48,7 +48,7 @@ getLatestPrice | more tests in-progress
 forge test --contracts ./src/test/Chainlink.sol -vv
 ```
 ### Compound Testing
-ERC20 - cToken Supply/Redeem | more tests in-progress
+ERC20 - cToken Supply/Redeem/Borrow/Repay | more tests in-progress
 ```sh
 forge test --contracts ./src/test/CompoundErc20.sol -vv
 ```
