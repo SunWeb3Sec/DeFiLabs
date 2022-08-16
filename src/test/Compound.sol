@@ -13,19 +13,26 @@ contract ContractTest is Test {
   IERC20 DAI = IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F);
   CErc20 CDAI = CErc20(0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643);
   Comptroller comptroller = Comptroller(0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B);
-  PriceFeed priceFeed = PriceFeed(0x922018674c12a7F0D394ebEEf9B58F186CdE13c1);
+  PriceFeed priceFeed = PriceFeed(0x922018674c12a7F0D394ebEEf9B58F186CdE13c1); //UniswapAnchoredView
   uint supplyRate;
   uint exchangeRate;
   uint estimateBalance;
   uint balanceOfUnderlying;
   uint borrowedBalance;
+  uint price;
+  uint rerror; 
+  uint liquidity; 
+  uint shortfall;
+  uint colFactor;
+  uint supplied;
+  uint liqbalance;
   address cToken = 0xccF4429DB6322D5C611ee964527D42E5d685DD6a; //c_wbtc
   uint256 MAX_INT = 2**256 - 1;
   CheatCodes cheats = CheatCodes(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
 
   function setUp() public {
-    vm.createSelectFork("mainnet", 15317706);
-    vm.prank(0x218B95BE3ed99141b0144Dba6cE88807c4AD7C09);
+    vm.createSelectFork("mainnet", 12856077);
+    vm.prank(0x0C4809bE72F9E117D75381438c5dAeC8AbE75BaD);
     WBTC.transfer(address(this),100000000);
     WBTC.approve(address(C_WBTC), 100000000);
   }
@@ -114,11 +121,23 @@ contract ContractTest is Test {
     C_WBTC.redeem(cTokenAmount);
     emit log_named_uint("Redeemed BTC:", WBTC.balanceOf(address(this))); //0.99999999 btc
     balanceOfUnderlying = C_WBTC.balanceOfUnderlying(address(this));
-    emit log_named_uint("balanceOfUnderlying:", balanceOfUnderlying);
+    emit log_named_uint("supplied:", balanceOfUnderlying);
   }
 
   function testliquidate() public {
+    //getCollateralFactor
+
+    console.log("----Test Supply: 1 BTC----");
     C_WBTC.mint(100000000); // supply 1 btc.
+    emit log_named_decimal_uint("C_WBTC balance of borrower:", C_WBTC.balanceOf(address(this)),8);
+    (, colFactor, ) = comptroller.markets(address(C_WBTC));
+    emit log_named_decimal_uint("colFactor: %", colFactor,16);
+
+    supplied = C_WBTC.balanceOfUnderlying(address(this));
+    emit log_named_decimal_uint("supplied: ", supplied/100,6);
+
+    price = priceFeed.getUnderlyingPrice(address(CDAI));
+    emit log_named_decimal_uint("CDAI price: ", price,18);
 
     console.log("----Test Borrow----");
     address[] memory cTokens = new address[](1);
@@ -128,43 +147,88 @@ contract ContractTest is Test {
       address(this)
     );
 
-    emit log_named_uint("liquidity:", liquidity);
-    emit log_named_uint("shortfall:", shortfall);
-    CDAI.borrow(16657236916841275798069);
-    emit log_named_uint("Borrowed DAI:", DAI.balanceOf(address(this)));
+    emit log_named_decimal_uint("liquidity:", liquidity/10000,14);
+    emit log_named_decimal_uint("shortfall:", shortfall/10000,14);
+
+    // calculate max borrow
+    price = priceFeed.getUnderlyingPrice(address(CDAI));
+    emit log_named_decimal_uint("CDAI Price:", price,18);
+
+    // liquidity - USD scaled up by 1e18
+    // price - USD scaled up by 1e18
+    // decimals - decimals of token to borrow
+    uint maxBorrow = (liquidity * (10**18)) / price;
+    emit log_named_decimal_uint("maxBorrow", maxBorrow,18);
+
+
+    CDAI.borrow(20528281942644085640092);
+    emit log_named_decimal_uint("Borrowed DAI:", DAI.balanceOf(address(this)),18);
     
     CDAI.borrowBalanceCurrent(address(this));
     borrowedBalance = CDAI.borrowBalanceCurrent(address(this));
-    emit log_named_uint("borrowedBalance:", borrowedBalance/1e18);
-
-    emit log_named_uint("Borrowed DAI:", DAI.balanceOf(address(this))/1e18);
-
-
-    cheats.mockCall(address(comptroller),abi.encodeWithSelector(Comptroller.getAccountLiquidity.selector),abi.encode(0,0,1));
-
-    (uint aftererror, uint afterliquidity, uint aftershortfall) = comptroller.getAccountLiquidity(
+    emit log_named_decimal_uint("borrowedBalance:", borrowedBalance,18);
+    ( rerror,  liquidity,  shortfall) = comptroller.getAccountLiquidity(
       address(this)
     );
-    emit log_named_uint("afterliquidity:", afterliquidity);
-    emit log_named_uint("aftershortfall:", aftershortfall);
+    emit log_named_decimal_uint("Borrowed, liquidity:", liquidity/10000,14);
+    emit log_named_decimal_uint("Borrowed, shortfall:", shortfall/10000,14);
+
+
+    vm.roll(12866077);
+    console.log("----After some blocks---");
+    liqbalance =DAI.balanceOf(0xcd6Eb888e76450eF584E8B51bB73c76ffBa21FF2);
+    emit log_named_uint("Liquidator DAI balance:", liqbalance/10**18);
+
+// cheats.mockCall(address(comptroller),abi.encodeWithSelector(Comptroller.getAccountLiquidity.selector),abi.encode(0,0,1000000000000000000));
+    // problem here: how to manipulate price or borrow amount to make collateral to be liquidated?
+    ( error,  liquidity, shortfall) = comptroller.getAccountLiquidity(
+      address(this)
+    );
+
+    emit log_named_decimal_uint("Afterliquidity:", liquidity/10000,14);
+    emit log_named_decimal_uint("Aftershortfall:", shortfall/10000,14);
+
+    uint closeFactor = comptroller.closeFactorMantissa();
+    emit log_named_uint("closeFactor:", closeFactor/10**16);
+    uint repayAmount = (borrowedBalance * closeFactor)/10**18;
+    emit log_named_uint("repayAmount:", repayAmount/10**18);
 
 
     (uint e, uint cTokenCollateralAmount) = comptroller
     .liquidateCalculateSeizeTokens(
       address(CDAI),
       address(C_WBTC),
-      borrowedBalance
+      repayAmount
     );
-    emit log_named_uint("amountToBeLiquidated:", cTokenCollateralAmount);
-    vm.prank(0xe0f73b8d76D2Ad33492F995af218b03564b8Ce20);
-    CDAI.liquidateBorrow(address(this),16922056996920495145179,address(C_WBTC));
+    emit log_named_uint("amountToBeLiquidated:", cTokenCollateralAmount/10**6/100);
+ 
+ 
 
     console.log("----Test liquidation----");
    // repay(address(DAI),address(CDAI),MAX_INT);
-    emit log_named_uint("Borrowed DAI:", DAI.balanceOf(address(this)));
+    emit log_named_uint("Borrowed DAI:", DAI.balanceOf(address(this))/1e18);
+    vm.startPrank(0xcd6Eb888e76450eF584E8B51bB73c76ffBa21FF2);
+    DAI.approve(address(CDAI),repayAmount);
+
+    //Liquidate here, the sender liquidates the borrowers collateral.
+    //The collateral seized is transferred to the liquidator.
+    CDAI.liquidateBorrow(address(this),repayAmount,address(C_WBTC));
 
 
+    supplied = C_WBTC.balanceOfUnderlying(address(this));
+    emit log_named_decimal_uint("supplied: ", supplied/100,6);
+    
+    borrowedBalance = CDAI.borrowBalanceCurrent(address(this));
+    emit log_named_uint("borrowedBalance:", borrowedBalance/1e18);
 
+    uint incentive = comptroller.liquidationIncentiveMantissa();
+    emit log_named_decimal_uint("incentive:", incentive/100,16); //1.08%
+
+    uint liquidated = C_WBTC.balanceOfUnderlying(address(0xcd6Eb888e76450eF584E8B51bB73c76ffBa21FF2));
+    emit log_named_decimal_uint("liquidated: ", liquidated/10000,4); //0.3411
+
+    emit log_named_decimal_uint("C_WBTC balance of liquidator:", C_WBTC.balanceOf(0xcd6Eb888e76450eF584E8B51bB73c76ffBa21FF2),8);
+    
   }
 
   function estimateBalanceOfUnderlying() public returns (uint) {
@@ -194,7 +258,7 @@ contract ContractTest is Test {
     require(liquidity > 0, "liquidity = 0");
 
     // calculate max borrow
-    uint price = priceFeed.getUnderlyingPrice(_cTokenToBorrow);
+    price = priceFeed.getUnderlyingPrice(_cTokenToBorrow);
 
     // liquidity - USD scaled up by 1e18
     // price - USD scaled up by 1e18
