@@ -29,6 +29,12 @@ interface CErc20 {
     uint amount,
     address collateral
   ) external returns (uint);
+  function getPriorVotes(address , uint ) external view returns (uint96) ;
+  function transfer(address , uint ) external returns (bool) ;
+  function getCurrentVotes(address ) external view returns (uint96);
+  function approve(address , uint256 ) external returns (bool);
+  function delegate(address delegatee) external;
+
 }
 
 interface CEth {
@@ -89,4 +95,18 @@ interface Comptroller {
 
 interface PriceFeed {
   function getUnderlyingPrice(address cToken) external view returns (uint);
+}
+
+
+interface Governance {
+    function propose(
+        address[] memory targets,
+        uint256[] memory values,
+        string[] memory signatures,
+        bytes[] memory calldatas,
+        string memory description
+    ) external returns (uint256);
+    function queue(uint256 proposalId) external;
+    function execute(uint256 proposalId) external;
+    function castVote(uint256 proposalId, uint8 support) external;
 }
