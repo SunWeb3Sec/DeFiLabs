@@ -50,7 +50,11 @@ forge test --contracts ./src/test/Chainlink.sol -vv
 ### Compound Testing
 ERC20 - cToken Supply/Redeem/Borrow/Repay | more tests in-progress
 ```sh
-forge test --contracts ./src/test/CompoundErc20.sol -vv
+forge test --contracts ./src/test/Compound.sol -vv
+```
+Goverance - submit proposal | more tests in-progress
+```sh
+forge test --contracts ./src/test/Compound-dao.sol -vv
 ```
 ### UniswapV2 Testing
 Swap | more tests in-progress
