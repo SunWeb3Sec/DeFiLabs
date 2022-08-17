@@ -4,7 +4,7 @@ pragma solidity ^0.8.13;
 import "forge-std/Test.sol";
 import "./interfaces/ICompound.sol";
 import "./interfaces/IERC20.sol";
-import "./interfaces/cheat.sol";
+// import "./interfaces/cheat.sol";
 
 contract ContractTest is Test {
 
@@ -28,7 +28,7 @@ contract ContractTest is Test {
   uint liqbalance;
   address cToken = 0xccF4429DB6322D5C611ee964527D42E5d685DD6a; //c_wbtc
   uint256 MAX_INT = 2**256 - 1;
-  CheatCodes cheats = CheatCodes(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
+  // CheatCodes cheats = CheatCodes(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
 
   function setUp() public {
     vm.createSelectFork("mainnet", 12856077);
