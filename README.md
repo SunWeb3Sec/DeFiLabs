@@ -10,6 +10,8 @@ This repo aim to learn DeFi projects; how the functionality works, on-chain test
 
 * Clone and install dependencies:```git submodule update --init --recursive```
 
+* To see function signatures you shoul add `--etherscan-api-key YOURAPIKEY` at the end of the `forge test`, you coul get an API key on https://etherscan.io/myapikey
+
 ### FlashLoan Testing
 
 UniSwapV2 FlashSwap Testing
