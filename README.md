@@ -58,6 +58,11 @@ Goverance - submit proposal | more tests in-progress
 ```sh
 forge test --contracts ./src/test/Compound-dao.sol -vv
 ```
+### UniswapV3 Testing
+Get Time Widget Avarge Tick | more tests in-progress
+```sh
+forge test --contracts ./src/test/Uniswapv3_twap.sol -vv
+```
 ### UniswapV2 Testing
 Swap | more tests in-progress
 ```sh
