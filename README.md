@@ -59,7 +59,7 @@ Goverance - submit proposal | more tests in-progress
 forge test --contracts ./src/test/Compound-dao.sol -vv
 ```
 ### UniswapV3 Testing
-Get Time Widget Avarge Tick | more tests in-progress
+Get Time Widget Avarge Tick | [Periphery](https://github.com/gakonst/v3-periphery-foundry)
 ```sh
 forge test --contracts ./src/test/Uniswapv3_twap.sol -vv
 ```
