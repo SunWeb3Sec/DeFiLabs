@@ -64,7 +64,7 @@ Get Time Widget Avarge Tick | more tests in-progress
 forge test --contracts ./src/test/Uniswapv3_twap.sol -vv
 ```
 ### UniswapV2 Testing
-Swap | more tests in-progress
+Swap | [Router | Pair | Factory | Library](https://github.com/Jeiwan/zuniswapv2)
 ```sh
 forge test --contracts ./src/test/Uniswapv2.sol -vv
 ```
