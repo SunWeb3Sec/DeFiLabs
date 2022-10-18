@@ -73,5 +73,11 @@ Swap | more tests in-progress
 ```sh
 forge test --contracts ./src/test/Curve.sol -vv
 ```
+
+### GMX Swap Testing
+
+```sh
+forge test --contracts ./src/test/gmx_swap.sol -vv
+```
 ### MakerDAO Testing
 ### Balancer Testing
