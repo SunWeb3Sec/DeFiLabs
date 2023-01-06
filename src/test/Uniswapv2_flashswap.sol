@@ -24,20 +24,23 @@ contract ContractTest is Test {
     uint256 amount1,
     bytes calldata data
   ) external {
-    emit log_named_uint(
+    emit log_named_decimal_uint(
       "Before flashswap, WETH balance of user:",
-      weth.balanceOf(address(this))
+      weth.balanceOf(address(this)),
+      18
     );
     // 0.3% fees
     uint256 fee = ((amount1 * 3) / 997) + 1;
     uint256 amountToRepay = amount1 + fee;
-    emit log_named_uint("Amount to repay:", amountToRepay);
+    emit log_named_decimal_uint("Amount to repay:", amountToRepay,18);
+
     weth.transfer(address(UniswapV2Pair), amountToRepay);
-    emit log_named_uint(
+
+    emit log_named_decimal_uint(
       "After flashswap, WETH balance of user:",
-      weth.balanceOf(address(this))
+      weth.balanceOf(address(this)),
+      18
     );
   }
-
   receive() external payable {}
 }
